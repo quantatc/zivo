@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zivo-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-zivo}
+      POSTGRES_USER: ${POSTGRES_USER:-zivo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zivo} -d ${POSTGRES_DB:-zivo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: zivo-litellm
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["--config=/app/config.yaml", "--port", "4000"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zivo}:${POSTGRES_PASSWORD:-change-me-postgres}@postgres:5432/${POSTGRES_DB:-zivo}
+      STORE_MODEL_IN_DB: "True"
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-zivo-demo-key}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:-change-me-32-char-salt-key}
+      UI_USERNAME: ${LITELLM_UI_USERNAME:-admin}
+      UI_PASSWORD: ${LITELLM_UI_PASSWORD:-admin1234}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      VERTEXAI_PROJECT: ${VERTEXAI_PROJECT:-}
+      VERTEXAI_LOCATION: ${VERTEXAI_LOCATION:-us-central1}
+      AZURE_API_KEY: ${AZURE_API_KEY:-}
+      AZURE_API_BASE: ${AZURE_API_BASE:-}
+      AZURE_API_VERSION: ${AZURE_API_VERSION:-}
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml:ro
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.8.12
+    container_name: zivo
+    depends_on:
+      litellm:
+        condition: service_healthy
+    environment:
+      WEBUI_NAME: ${WEBUI_NAME:-Zivo Workspace}
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:-change-me-webui-secret}
+      WEBUI_URL: ${WEBUI_URL:-http://localhost:3000}
+      ENABLE_SIGNUP: ${ENABLE_SIGNUP:-true}
+      OPENAI_API_BASE_URL: http://litellm:4000/v1
+      OPENAI_API_KEY: ${LITELLM_MASTER_KEY:-sk-zivo-demo-key}
+    volumes:
+      - open-webui-data:/app/backend/data
+      - ./branding/logo.png:/app/backend/open_webui/static/logo.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png:ro
+      - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
+    ports:
+      - "3000:8080"
+    restart: unless-stopped
+
+volumes:
+  open-webui-data:
+  postgres-data:
