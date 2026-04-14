@@ -234,7 +234,7 @@ services:
       - sh
       - -c
       - |
-        npm install --legacy-peer-deps &&
+        npm install --legacy-peer-deps --ignore-scripts &&
         npm run build &&
         npx serve@latest build -l 3000 -s
     volumes:
