@@ -143,8 +143,7 @@ services:
       VECTOR_DB: chroma
       CHROMA_HTTP_HOST: chroma
       CHROMA_HTTP_PORT: "8000"
-      CHROMA_HTTP_HEADERS: >-
-        {"Authorization":"Bearer ${CHROMA_AUTH_TOKEN}"}
+      CHROMA_HTTP_HEADERS: "Authorization=Bearer ${CHROMA_AUTH_TOKEN}"
       OLLAMA_BASE_URL: http://ollama:11434
     volumes:
       - open-webui-data:/app/backend/data
