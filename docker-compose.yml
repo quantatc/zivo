@@ -232,7 +232,10 @@ services:
     command:
       - sh
       - -c
-      - npm install && npm run build && npm run serve
+      - |
+        npm install --legacy-peer-deps &&
+        npm run build &&
+        npx serve@latest build -l 3000 -s
     volumes:
       - ./evidence:/usr/src/app
       - evidence-node-modules:/usr/src/app/node_modules
@@ -243,14 +246,5 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 120s
     restart: unless-stopped
-
-volumes:
-  open-webui-data:
-  postgres-data:
-  chroma-data:
-  ollama-data:
-  n8n-data:
-  redis-data:
-  evidence-node-modules:
