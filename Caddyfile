@@ -3,6 +3,7 @@ zivo.tafarax.com {
 
     @n8n path /n8n /n8n/*
     handle @n8n {
+        uri strip_prefix /n8n
         reverse_proxy 127.0.0.1:5678
     }
 
