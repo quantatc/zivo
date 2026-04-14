@@ -147,9 +147,9 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
     volumes:
       - open-webui-data:/app/backend/data
-      - ./branding/logo.png:/app/backend/open_webui/static/logo.png:ro
-      - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png:ro
-      - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
+      - ./branding/logo.png:/app/backend/open_webui/static/logo.png
+      - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png
+      - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico
     ports:
       - "127.0.0.1:3000:8080"
     restart: unless-stopped
