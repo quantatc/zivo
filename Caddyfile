@@ -7,7 +7,8 @@ zivo.tafarax.com {
     }
 
     @reports path /reports /reports/*
-    handle_path @reports {
+    handle @reports {
+        uri strip_prefix /reports
         reverse_proxy 127.0.0.1:3100
     }
 
