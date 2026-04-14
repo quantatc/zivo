@@ -236,6 +236,7 @@ services:
       - |
         npm install --legacy-peer-deps --ignore-scripts &&
         echo '{"type":"module"}' > node_modules/@evidence-dev/evidence/template/package.json &&
+        sed -i "s|external: \['@evidence-dev/db-orchestrator|noExternal: ['@evidence-dev/component-utilities'],external: ['@evidence-dev/db-orchestrator|" node_modules/@evidence-dev/evidence/template/vite.config.js &&
         npm run build &&
         npx serve@latest build -l 3000 -s
     volumes:
