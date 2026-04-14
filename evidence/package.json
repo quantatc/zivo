@@ -1,0 +1,24 @@
+{
+  "name": "zivo-evidence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:sources": "node -e \"const fs=require('fs'); const path=require('path'); const template=fs.readFileSync('sources/zivo_db.yaml','utf8'); const values={POSTGRES_HOST:process.env.POSTGRES_HOST||'postgres',POSTGRES_PORT:process.env.POSTGRES_PORT||'5432',POSTGRES_DB:process.env.POSTGRES_DB||'zivo',POSTGRES_USER:process.env.POSTGRES_USER||'zivo',POSTGRES_PASSWORD:process.env.POSTGRES_PASSWORD||''}; const rendered=template.replace(/\\$\\{([A-Z0-9_]+)\\}/g, (_, key) => values[key] ?? ''); fs.mkdirSync(path.join('sources','zivo_db'), { recursive: true }); fs.writeFileSync(path.join('sources','zivo_db','connection.yaml'), rendered); fs.writeFileSync(path.join('sources','zivo_db','transactions.sql'), 'select\\n  id,\\n  amount,\\n  category,\\n  flagged,\\n  created_at\\nfrom public.transactions;\\n');\"",
+    "sources": "npm run prepare:sources && evidence sources",
+    "build": "npm run prepare:sources && evidence sources && evidence build",
+    "dev": "npm run prepare:sources && evidence sources && evidence dev --host 0.0.0.0 --open /",
+    "preview": "npm run prepare:sources && evidence sources && evidence preview",
+    "serve": "serve -s build -l 3000"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@evidence-dev/core-components": "^5.4.2",
+    "@evidence-dev/evidence": "^40.1.8",
+    "@evidence-dev/postgres": "^1.0.10",
+    "serve": "^14.2.4"
+  }
+}

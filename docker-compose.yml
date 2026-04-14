@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-zivo}
       POSTGRES_USER: ${POSTGRES_USER:-zivo}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -13,6 +13,74 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: zivo-redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command:
+      - sh
+      - -c
+      - |
+        if [ -n "$$REDIS_PASSWORD" ]; then
+          exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"
+        fi
+        exec redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - |
+          if [ -n "$$REDIS_PASSWORD" ]; then
+            redis-cli -a "$$REDIS_PASSWORD" ping
+          else
+            redis-cli ping
+          fi
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  chroma:
+    image: chromadb/chroma:0.5.20
+    container_name: zivo-chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "false"
+      CHROMA_SERVER_AUTHN_CREDENTIALS: ${CHROMA_AUTH_TOKEN}
+      CHROMA_SERVER_AUTHN_PROVIDER: chromadb.auth.token_authn.TokenAuthenticationServerProvider
+      CHROMA_AUTH_TOKEN_TRANSPORT_HEADER: Authorization
+    volumes:
+      - chroma-data:/chroma/chroma
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os, urllib.request; req = urllib.request.Request('http://127.0.0.1:8000/api/v1/heartbeat', headers={'Authorization': f'Bearer {os.environ[\"CHROMA_SERVER_AUTHN_CREDENTIALS\"]}'}); urllib.request.urlopen(req, timeout=5)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: zivo-ollama
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
     restart: unless-stopped
 
   litellm:
@@ -23,12 +91,12 @@ services:
         condition: service_healthy
     command: ["--config=/app/config.yaml", "--port", "4000"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-zivo}:${POSTGRES_PASSWORD:-change-me-postgres}@postgres:5432/${POSTGRES_DB:-zivo}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zivo}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-zivo}
       STORE_MODEL_IN_DB: "True"
-      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-zivo-demo-key}
-      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:-change-me-32-char-salt-key}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY}
       UI_USERNAME: ${LITELLM_UI_USERNAME:-admin}
-      UI_PASSWORD: ${LITELLM_UI_PASSWORD:-admin1234}
+      UI_PASSWORD: ${LITELLM_UI_PASSWORD}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
@@ -41,8 +109,6 @@ services:
       AZURE_API_VERSION: ${AZURE_API_VERSION:-}
     volumes:
       - ./litellm/config.yaml:/app/config.yaml:ro
-    ports:
-      - "4000:4000"
     healthcheck:
       test:
         [
@@ -63,22 +129,129 @@ services:
     depends_on:
       litellm:
         condition: service_healthy
+      chroma:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
     environment:
       WEBUI_NAME: ${WEBUI_NAME:-Zivo Workspace}
-      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:-change-me-webui-secret}
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
       WEBUI_URL: ${WEBUI_URL:-http://localhost:3000}
       ENABLE_SIGNUP: ${ENABLE_SIGNUP:-true}
       OPENAI_API_BASE_URL: http://litellm:4000/v1
-      OPENAI_API_KEY: ${LITELLM_MASTER_KEY:-sk-zivo-demo-key}
+      OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
+      VECTOR_DB: chroma
+      CHROMA_HTTP_HOST: chroma
+      CHROMA_HTTP_PORT: "8000"
+      CHROMA_HTTP_HEADERS: >-
+        {"Authorization":"Bearer ${CHROMA_AUTH_TOKEN}"}
+      OLLAMA_BASE_URL: http://ollama:11434
     volumes:
       - open-webui-data:/app/backend/data
       - ./branding/logo.png:/app/backend/open_webui/static/logo.png:ro
       - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png:ro
       - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
     ports:
-      - "3000:8080"
+      - "127.0.0.1:3000:8080"
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: zivo-n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-zivo}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-zivo}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: n8n
+      EXECUTIONS_MODE: queue
+      OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
+      QUEUE_BULL_REDIS_HOST: redis
+      QUEUE_BULL_REDIS_PORT: "6379"
+      QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+      N8N_EDITOR_BASE_URL: ${WEBHOOK_URL}
+      N8N_PATH: /n8n/
+      N8N_PROXY_HOPS: "1"
+      N8N_HOST: zivo.tafarax.com
+      N8N_PROTOCOL: https
+      N8N_SECURE_COOKIE: "true"
+    volumes:
+      - n8n-data:/home/node/.n8n
+    ports:
+      - "127.0.0.1:5678:5678"
+    restart: unless-stopped
+
+  n8n-worker:
+    image: n8nio/n8n:latest
+    container_name: zivo-n8n-worker
+    command: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      n8n:
+        condition: service_started
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-zivo}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-zivo}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: n8n
+      EXECUTIONS_MODE: queue
+      QUEUE_BULL_REDIS_HOST: redis
+      QUEUE_BULL_REDIS_PORT: "6379"
+      QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      QUEUE_HEALTH_CHECK_ACTIVE: "true"
+    restart: unless-stopped
+
+  evidence:
+    image: node:20-alpine
+    container_name: zivo-evidence
+    working_dir: /usr/src/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-zivo}
+      POSTGRES_USER: ${POSTGRES_USER:-zivo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    command:
+      - sh
+      - -c
+      - npm install && npm run build && npm run serve
+    volumes:
+      - ./evidence:/usr/src/app
+      - evidence-node-modules:/usr/src/app/node_modules
+    ports:
+      - "127.0.0.1:3100:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
 volumes:
   open-webui-data:
   postgres-data:
+  chroma-data:
+  ollama-data:
+  n8n-data:
+  redis-data:
+  evidence-node-modules:

@@ -1,0 +1,15 @@
+zivo.tafarax.com {
+    encode gzip zstd
+
+    @n8n path /n8n /n8n/*
+    handle_path @n8n {
+        reverse_proxy 127.0.0.1:5678
+    }
+
+    @reports path /reports /reports/*
+    handle_path @reports {
+        reverse_proxy 127.0.0.1:3100
+    }
+
+    reverse_proxy 127.0.0.1:3000
+}

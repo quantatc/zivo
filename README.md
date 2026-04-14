@@ -41,6 +41,114 @@ docker compose up -d
 - Zivo UI: `http://localhost:3000`
 - LiteLLM admin: `http://localhost:4000`
 
+## Production deployment
+
+The current live deployment pattern is:
+
+- Hetzner Cloud `CPX22`
+- Cloudflare DNS for `zivo.tafarax.com`
+- Caddy on the host for HTTPS and reverse proxy
+- Docker Compose running from `/opt/zivo/zivo`
+
+On the server, the repo ended up under `/opt/zivo/zivo`, so all Docker commands
+should be run from that directory.
+
+Recommended production `.env` values:
+
+```env
+WEBUI_URL=https://zivo.tafarax.com
+ENABLE_SIGNUP=false
+```
+
+For a fresh production deploy where no admin exists yet, add:
+
+```env
+WEBUI_ADMIN_NAME=Your Name
+WEBUI_ADMIN_EMAIL=you@tafarax.com
+WEBUI_ADMIN_PASSWORD=choose-a-strong-password
+```
+
+Use localhost-only port bindings in production so only Caddy is public:
+
+```yaml
+open-webui:
+  ports:
+    - "127.0.0.1:3000:8080"
+
+litellm:
+  ports:
+    - "127.0.0.1:4000:4000"
+```
+
+Minimal Caddy config:
+
+```caddy
+zivo.tafarax.com {
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:3000
+}
+```
+
+Cloudflare DNS should point `zivo.tafarax.com` to the Hetzner server IP. Start
+with `DNS only`, confirm the site works, then switch to `Proxied` and set
+Cloudflare SSL mode to `Full (strict)`.
+
+Branding assets:
+
+- [branding/logo.png](/d:/AlgorithmicTradingProjects/zivo/branding/logo.png) is mounted as the app logo
+- [branding/favicon.png](/d:/AlgorithmicTradingProjects/zivo/branding/favicon.png) is mounted as the PNG favicon
+- `branding/favicon.ico` is mounted as the ICO favicon
+
+## Operations summary
+
+Run all commands from:
+
+```bash
+cd /opt/zivo/zivo
+```
+
+Useful commands:
+
+- Start or refresh the stack:
+  ```bash
+  docker compose up -d
+  ```
+- Check container state:
+  ```bash
+  docker compose ps
+  ```
+- Follow Open WebUI logs:
+  ```bash
+  docker compose logs -f open-webui
+  ```
+- Follow LiteLLM logs:
+  ```bash
+  docker compose logs -f litellm
+  ```
+- Restart LiteLLM after changing model aliases:
+  ```bash
+  docker compose restart litellm
+  ```
+- Recreate Open WebUI after changing branding or admin env vars:
+  ```bash
+  docker compose up -d --force-recreate open-webui
+  ```
+- Bootstrap the first admin on a fresh deploy:
+  Add `WEBUI_ADMIN_NAME`, `WEBUI_ADMIN_EMAIL`, and `WEBUI_ADMIN_PASSWORD` to `.env`, then run:
+  ```bash
+  docker compose up -d --force-recreate open-webui
+  ```
+- Pull newer images and restart:
+  ```bash
+  docker compose pull
+  docker compose up -d
+  ```
+- Check Caddy:
+  ```bash
+  systemctl status caddy
+  journalctl -u caddy -f
+  ```
+
 ## How model routing works
 
 Open WebUI talks only to LiteLLM:
@@ -66,15 +174,19 @@ There are two ways to add models:
 
 The demo now ships with an OpenRouter-first model menu:
 
-- `Zivo Fast` -> `openrouter/openai/gpt-5-mini`
-- `Zivo Balanced` -> `openrouter/anthropic/claude-sonnet-4.5`
-- `Zivo Reasoning` -> `openrouter/openai/gpt-5`
-- `Zivo Research` -> `openrouter/google/gemini-2.5-pro`
-- `Zivo Creative` -> `openrouter/x-ai/grok-4`
+- `Zivo Free Auto (OpenRouter Free)` -> `openrouter/free`
+- `Zivo Free Llama (Llama 3.3 70B)` -> `openrouter/meta-llama/llama-3.3-70b-instruct:free`
+- `Zivo Free Qwen (Qwen 3.6 Plus)` -> `openrouter/qwen/qwen3.6-plus:free`
+- `Zivo Free OSS (GPT OSS 20B)` -> `openrouter/openai/gpt-oss-20b:free`
+- `Zivo Fast (GPT-5 Mini)` -> `openrouter/openai/gpt-5-mini`
+- `Zivo Balanced (Claude Sonnet 4.5)` -> `openrouter/anthropic/claude-sonnet-4.5`
+- `Zivo Reasoning (GPT-5)` -> `openrouter/openai/gpt-5`
+- `Zivo Research (Gemini 2.5 Pro)` -> `openrouter/google/gemini-2.5-pro`
+- `Zivo Creative (Grok 4)` -> `openrouter/x-ai/grok-4`
 
-This is deliberate. Instead of exposing raw vendor names in the UI, the demo
-uses job-to-be-done labels that are easier to sell to clients. All of them work
-through one upstream credential: `OPENROUTER_API_KEY`.
+This is deliberate. The UI uses Zivo-first labels for demos, but also shows the
+actual model in parentheses so technical users can see what they are selecting.
+All of these work through one upstream credential: `OPENROUTER_API_KEY`.
 
 After adding aliases, restart LiteLLM:
 
