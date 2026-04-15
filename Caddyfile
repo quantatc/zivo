@@ -1,3 +1,8 @@
+reports.tafarax.com {
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:3100
+}
+
 zivo.tafarax.com {
     encode gzip zstd
 
@@ -5,12 +10,6 @@ zivo.tafarax.com {
     handle @n8n {
         uri strip_prefix /n8n
         reverse_proxy 127.0.0.1:5678
-    }
-
-    @reports path /reports /reports/*
-    handle @reports {
-        uri strip_prefix /reports
-        reverse_proxy 127.0.0.1:3100
     }
 
     reverse_proxy 127.0.0.1:3000
