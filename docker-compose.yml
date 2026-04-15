@@ -230,13 +230,36 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-zivo}
       POSTGRES_USER: ${POSTGRES_USER:-zivo}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      EVIDENCE_SOURCE__zivo_db__host: postgres
+      EVIDENCE_SOURCE__zivo_db__port: "5432"
+      EVIDENCE_SOURCE__zivo_db__database: ${POSTGRES_DB:-zivo}
+      EVIDENCE_SOURCE__zivo_db__user: ${POSTGRES_USER:-zivo}
+      EVIDENCE_SOURCE__zivo_db__password: ${POSTGRES_PASSWORD}
     command:
       - sh
       - -c
       - |
+        apk add --no-cache postgresql-client &&
         npm install --legacy-peer-deps --ignore-scripts &&
         echo '{"type":"module"}' > node_modules/@evidence-dev/evidence/template/package.json &&
         grep -q "noExternal" node_modules/@evidence-dev/evidence/template/vite.config.js || sed -i "s|external: \['@evidence-dev/db-orchestrator|noExternal: ['@evidence-dev/component-utilities'],external: ['@evidence-dev/db-orchestrator|" node_modules/@evidence-dev/evidence/template/vite.config.js &&
+        PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+          CREATE TABLE IF NOT EXISTS transactions (
+            id BIGSERIAL PRIMARY KEY,
+            amount NUMERIC(18,4) NOT NULL DEFAULT 0,
+            category TEXT NOT NULL DEFAULT '',
+            flagged BOOLEAN NOT NULL DEFAULT FALSE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+          );
+          INSERT INTO transactions (amount, category, flagged, created_at)
+          SELECT
+            round((random()*9999+1)::numeric, 4),
+            (ARRAY['food','travel','electronics','clothing','utilities'])[floor(random()*5+1)::int],
+            random() > 0.8,
+            NOW() - interval '1 day' * (random()*90)::int
+          FROM generate_series(1,100)
+          WHERE NOT EXISTS (SELECT 1 FROM transactions LIMIT 1);
+        " || true &&
         npm run build &&
         npx serve@latest build -l 3000 -s
     volumes:
