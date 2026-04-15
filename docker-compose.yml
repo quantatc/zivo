@@ -243,7 +243,7 @@ services:
         npm install --legacy-peer-deps --ignore-scripts &&
         echo '{"type":"module"}' > node_modules/@evidence-dev/evidence/template/package.json &&
         grep -q "noExternal" node_modules/@evidence-dev/evidence/template/vite.config.js || sed -i "s|external: \['@evidence-dev/db-orchestrator|noExternal: ['@evidence-dev/component-utilities'],external: ['@evidence-dev/db-orchestrator|" node_modules/@evidence-dev/evidence/template/vite.config.js &&
-        PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+        PGPASSWORD="$$POSTGRES_PASSWORD" psql -h postgres -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "
           CREATE TABLE IF NOT EXISTS transactions (
             id BIGSERIAL PRIMARY KEY,
             amount NUMERIC(18,4) NOT NULL DEFAULT 0,
