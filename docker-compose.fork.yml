@@ -1,0 +1,6 @@
+services:
+  open-webui:
+    build:
+      context: ${OPEN_WEBUI_FORK_PATH:-../zivo-openwebui}
+      dockerfile: Dockerfile
+    image: ${OPEN_WEBUI_IMAGE:-zivo-openwebui:v0.8.12-zivo.1}

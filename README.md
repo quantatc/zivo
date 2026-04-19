@@ -11,6 +11,7 @@ later plug in custom agent backends.
 - LiteLLM as the LLM gateway and model alias layer
 - Postgres for LiteLLM state and admin configuration
 - Local branding assets mounted into Open WebUI
+- Optional Zivo Open WebUI fork image for white-label/product UI changes
 
 ## Branding behavior
 
@@ -148,6 +149,16 @@ Useful commands:
   systemctl status caddy
   journalctl -u caddy -f
   ```
+
+## Open WebUI fork
+
+Zivo can run either the upstream Open WebUI image or a thin Zivo fork image. The
+main Compose file reads `OPEN_WEBUI_IMAGE`, so production can switch images
+without changing service wiring.
+
+Use the fork for source-level branding and product language changes, especially
+keeping **Workspace** while presenting Open WebUI "Models" as Zivo **Agents**.
+The fork workflow is documented in [docs/openwebui-fork.md](/d:/AlgorithmicTradingProjects/zivo/docs/openwebui-fork.md).
 
 ## How model routing works
 
