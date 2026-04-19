@@ -1,0 +1,155 @@
+{
+  "name": "Atlas - 02 Fraud Policy Check",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fraud-policy-check",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-in",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "atlas-fraud-policy-check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Accept either a full atlas-api transaction object (from POST /transactions response)\n// or a {payload: {...}} envelope (from /actions/trigger-workflow).\nconst raw = $json;\nconst tx = raw.payload || raw;\n// Fall back to required fields with sane defaults so the LLM call doesn't blow up\nreturn [{ json: {\n  id: tx.id || tx.transaction_id || null,\n  amount: tx.amount,\n  category: tx.category,\n  vendor_id: tx.vendor_id,\n  vendor_name: tx.vendor_name || null,\n  description: tx.description || null\n}}];"
+      },
+      "id": "normalize",
+      "name": "Normalize input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://litellm:4000/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.LITELLM_MASTER_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'Zivo Fast (GPT-5 Mini)',\n  response_format: { type: 'json_object' },\n  temperature: 0.1,\n  messages: [\n    { role: 'system', content: 'You are an expense policy auditor for Atlas Operations. Reply with JSON only: {\"flagged\": boolean, \"severity\": \"low\"|\"medium\"|\"high\", \"reason\": string}. Flag transactions when: amount > $4000 (any category), amount > $1500 for meals/travel, vendor name suggests irregularity, or description hints at policy violation.' },\n    { role: 'user', content: `Review this transaction:\\nAmount: $${$json.amount}\\nCategory: ${$json.category}\\nVendor: ${$json.vendor_name || 'unknown'}\\nDescription: ${$json.description || 'n/a'}` }\n  ]\n}) }}",
+        "options": {}
+      },
+      "id": "litellm-call",
+      "name": "Policy LLM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the LLM verdict and normalize\nlet verdict = { flagged: false, severity: 'low', reason: 'parse_error' };\ntry {\n  const content = $json.choices[0].message.content;\n  verdict = JSON.parse(content);\n} catch (e) {\n  // leave default verdict\n}\nconst tx = $('Normalize input').first().json;\nreturn [{ json: {\n  transaction_id: tx.id,\n  flagged: !!verdict.flagged,\n  severity: verdict.severity || 'low',\n  policy_violation: verdict.flagged ? (verdict.reason || 'unspecified') : null\n}}];"
+      },
+      "id": "parse-verdict",
+      "name": "Parse verdict",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://atlas-api:8000/transactions/{{$json.transaction_id}}/policy",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ flagged: $json.flagged, policy_violation: $json.policy_violation }) }}",
+        "options": {}
+      },
+      "id": "apply-verdict",
+      "name": "Apply verdict",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{$('Parse verdict').first().json.severity}}",
+              "rightValue": "high",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-high",
+      "name": "If high severity",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1320, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://atlas-api:8000/cases",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  transaction_id: $('Parse verdict').first().json.transaction_id,\n  notes: 'Auto-opened by fraud-policy-check (severity=high). Reason: ' + ($('Parse verdict').first().json.policy_violation || 'unspecified'),\n  opened_by: 'n8n.fraud-policy-check'\n}) }}",
+        "options": {}
+      },
+      "id": "open-case",
+      "name": "Open case",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ verdict: $('Parse verdict').first().json, case_opened: $('If high severity').first().json !== undefined }) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1760, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Normalize input", "type": "main", "index": 0 }]]
+    },
+    "Normalize input": {
+      "main": [[{ "node": "Policy LLM", "type": "main", "index": 0 }]]
+    },
+    "Policy LLM": {
+      "main": [[{ "node": "Parse verdict", "type": "main", "index": 0 }]]
+    },
+    "Parse verdict": {
+      "main": [[{ "node": "Apply verdict", "type": "main", "index": 0 }]]
+    },
+    "Apply verdict": {
+      "main": [[{ "node": "If high severity", "type": "main", "index": 0 }]]
+    },
+    "If high severity": {
+      "main": [
+        [{ "node": "Open case", "type": "main", "index": 0 }],
+        [{ "node": "Respond", "type": "main", "index": 0 }]
+      ]
+    },
+    "Open case": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "version": 1,
+  "tags": [{ "name": "atlas-demo" }]
+}

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.evidence.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:evidence.dev)",
+      "Bash(ssh root@46.225.236.150 \"docker exec zivo-evidence sh -c 'grep -i \\\\\"source\\\\\" /usr/src/app/node_modules/@evidence-dev/plugin-connector/dist/index.cjs | grep -i \\\\\"yaml\\\\\\\\|dir\\\\\\\\|folder\\\\\\\\|connection\\\\\" | head -20'\")",
+      "Bash(ssh root@46.225.236.150 \"docker exec zivo-evidence sh -c 'grep -o \\\\\"EVIDENCE_[A-Z_]*\\\\\" /usr/src/app/node_modules/@evidence-dev/plugin-connector/dist/index.cjs | sort -u'\")",
+      "Bash(ssh root@46.225.236.150 'docker exec zivo-evidence sh -c '\\\\''grep -A 30 \"export\\\\$e0cbf1bbd256fc2f = .0\" /usr/src/app/node_modules/@evidence-dev/plugin-connector/dist/index.cjs | head -35'\\\\''')"
+    ]
+  }
+}

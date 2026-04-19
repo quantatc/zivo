@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/seed_atlas.sql:/docker-entrypoint-initdb.d/02-seed_atlas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zivo} -d ${POSTGRES_DB:-zivo}"]
       interval: 10s
@@ -155,6 +156,26 @@ services:
       - "127.0.0.1:3000:8080"
     restart: unless-stopped
 
+  atlas-api:
+    build: ./atlas-api
+    container_name: zivo-atlas-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-zivo}
+      POSTGRES_USER: ${POSTGRES_USER:-zivo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      LITELLM_BASE_URL: http://litellm:4000
+      LITELLM_API_KEY: ${LITELLM_MASTER_KEY}
+      LITELLM_EMAIL_MODEL: ${ATLAS_EMAIL_MODEL:-Zivo Fast (GPT-5 Mini)}
+      N8N_WEBHOOK_BASE_URL: http://n8n:5678/webhook
+    ports:
+      - "127.0.0.1:8088:8000"
+    restart: unless-stopped
+
   n8n:
     image: n8nio/n8n:latest
     container_name: zivo-n8n
@@ -184,6 +205,8 @@ services:
       N8N_HOST: zivo.tafarax.com
       N8N_PROTOCOL: https
       N8N_SECURE_COOKIE: "true"
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      OPS_DIGEST_WEBHOOK_URL: ${OPS_DIGEST_WEBHOOK_URL:-}
     volumes:
       - n8n-data:/home/node/.n8n
     ports:
@@ -215,6 +238,8 @@ services:
       QUEUE_BULL_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
       QUEUE_HEALTH_CHECK_ACTIVE: "true"
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      OPS_DIGEST_WEBHOOK_URL: ${OPS_DIGEST_WEBHOOK_URL:-}
     restart: unless-stopped
 
   evidence:
@@ -239,29 +264,11 @@ services:
       - sh
       - -c
       - |
-        apk add --no-cache postgresql-client &&
         npm install --legacy-peer-deps --ignore-scripts &&
         echo '{"type":"module"}' > node_modules/@evidence-dev/evidence/template/package.json &&
         grep -q "noExternal" node_modules/@evidence-dev/evidence/template/vite.config.js || sed -i "s|external: \['@evidence-dev/db-orchestrator|noExternal: ['@evidence-dev/component-utilities'],external: ['@evidence-dev/db-orchestrator|" node_modules/@evidence-dev/evidence/template/vite.config.js &&
         grep -q "fallback" node_modules/@evidence-dev/evidence/template/svelte.config.js || sed -i "s/strict: false/strict: false, fallback: 'index.html'/" node_modules/@evidence-dev/evidence/template/svelte.config.js &&
         grep -q "handleHttpError" node_modules/@evidence-dev/evidence/template/svelte.config.js || sed -i "s/files: {/prerender: { handleHttpError: function(e) { console.warn('[prerender]', e.path, e.message); } },\n\t\tfiles: {/" node_modules/@evidence-dev/evidence/template/svelte.config.js &&
-        PGPASSWORD="$$POSTGRES_PASSWORD" psql -h postgres -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "
-          CREATE TABLE IF NOT EXISTS transactions (
-            id BIGSERIAL PRIMARY KEY,
-            amount NUMERIC(18,4) NOT NULL DEFAULT 0,
-            category TEXT NOT NULL DEFAULT '',
-            flagged BOOLEAN NOT NULL DEFAULT FALSE,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-          );
-          INSERT INTO transactions (amount, category, flagged, created_at)
-          SELECT
-            round((random()*9999+1)::numeric, 4),
-            (ARRAY['food','travel','electronics','clothing','utilities'])[floor(random()*5+1)::int],
-            random() > 0.8,
-            NOW() - interval '1 day' * (random()*90)::int
-          FROM generate_series(1,100)
-          WHERE NOT EXISTS (SELECT 1 FROM transactions LIMIT 1);
-        " || true &&
         npm run build &&
         npx serve@latest build -l 3000 -s
     volumes:

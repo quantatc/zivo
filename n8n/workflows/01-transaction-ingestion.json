@@ -1,0 +1,79 @@
+{
+  "name": "Atlas - 01 Transaction Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 7am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generates a small batch of synthetic Atlas transactions to feed the demo.\nconst categories = ['office_supplies','software_saas','travel','meals','utilities','consulting','marketing','equipment','shipping','fuel'];\nconst vendorIds = Array.from({length: 25}, (_, i) => i + 1);\nconst customerIds = Array.from({length: 50}, (_, i) => i + 1);\nconst count = Math.floor(Math.random() * 11) + 5; // 5-15\nconst today = new Date().toISOString().slice(0,10);\nconst out = [];\nfor (let i = 0; i < count; i++) {\n  const amount = Math.round((Math.random() * 4900 + 50) * 100) / 100;\n  const category = categories[Math.floor(Math.random() * categories.length)];\n  const vendor_id = vendorIds[Math.floor(Math.random() * vendorIds.length)];\n  const customer_id = customerIds[Math.floor(Math.random() * customerIds.length)];\n  out.push({\n    json: {\n      amount,\n      category,\n      vendor_id,\n      customer_id,\n      description: `${category.replace('_',' ')} - batch ingest ${today}`,\n      flagged: false\n    }\n  });\n}\nreturn out;"
+      },
+      "id": "build-batch",
+      "name": "Generate batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://atlas-api:8000/transactions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "post-tx",
+      "name": "POST /transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://atlas-api:8000/actions/trigger-workflow",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflow_slug: 'fraud-policy-check', payload: $json }) }}",
+        "options": {}
+      },
+      "id": "fan-out-policy",
+      "name": "Trigger policy check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Daily 7am": {
+      "main": [[{ "node": "Generate batch", "type": "main", "index": 0 }]]
+    },
+    "Generate batch": {
+      "main": [[{ "node": "POST /transactions", "type": "main", "index": 0 }]]
+    },
+    "POST /transactions": {
+      "main": [[{ "node": "Trigger policy check", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "version": 1,
+  "tags": [{ "name": "atlas-demo" }]
+}

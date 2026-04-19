@@ -1,0 +1,134 @@
+{
+  "name": "Atlas - 03 Daily Ops Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://atlas-api:8000/kpi/snapshot?period=7d",
+        "options": {}
+      },
+      "id": "get-kpi",
+      "name": "GET /kpi/snapshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 220]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://atlas-api:8000/flagged?limit=15",
+        "options": {}
+      },
+      "id": "get-flagged",
+      "name": "GET /flagged",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge KPI snapshot + flagged transactions into one payload for the LLM\nconst kpi = $('GET /kpi/snapshot').first().json;\nconst flagged = $('GET /flagged').first().json || [];\nconst flaggedSummary = flagged.slice(0, 10).map(t => `- TX#${t.id} ${t.category} $${t.amount} (${t.vendor_name || 'unknown'}) - ${t.policy_violation || ''}`).join('\\n');\nreturn [{ json: { kpi, flagged_count: flagged.length, flagged_summary: flaggedSummary || '(none)' } }];"
+      },
+      "id": "build-prompt",
+      "name": "Build prompt context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://litellm:4000/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.LITELLM_MASTER_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'Zivo Balanced (Claude Sonnet 4.5)',\n  temperature: 0.3,\n  messages: [\n    { role: 'system', content: 'You write a concise daily ops digest for the leadership team at Atlas Operations. Output Markdown, max 250 words. Sections: \\\"Headline\\\", \\\"KPIs (7d)\\\", \\\"Flagged for review\\\", \\\"Action items\\\".' },\n    { role: 'user', content: `KPI snapshot (7d): ${JSON.stringify($json.kpi)}\\n\\nFlagged transactions (${$json.flagged_count}):\\n${$json.flagged_summary}\\n\\nWrite the digest.` }\n  ]\n}) }}",
+        "options": {}
+      },
+      "id": "llm-digest",
+      "name": "LLM digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const md = $json.choices[0].message.content;\nconst kpi = $('Build prompt context').first().json.kpi;\nreturn [{ json: {\n  digest_markdown: md,\n  kpi,\n  generated_at: new Date().toISOString()\n}}];"
+      },
+      "id": "package-digest",
+      "name": "Package digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1160, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OPS_DIGEST_WEBHOOK_URL || 'https://webhook.site/your-uuid-here'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "post-digest",
+      "name": "POST digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 300]
+    }
+  ],
+  "connections": {
+    "Daily 8am": {
+      "main": [
+        [
+          { "node": "GET /kpi/snapshot", "type": "main", "index": 0 },
+          { "node": "GET /flagged",      "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "GET /kpi/snapshot": {
+      "main": [[{ "node": "Build prompt context", "type": "main", "index": 0 }]]
+    },
+    "GET /flagged": {
+      "main": [[{ "node": "Build prompt context", "type": "main", "index": 0 }]]
+    },
+    "Build prompt context": {
+      "main": [[{ "node": "LLM digest", "type": "main", "index": 0 }]]
+    },
+    "LLM digest": {
+      "main": [[{ "node": "Package digest", "type": "main", "index": 0 }]]
+    },
+    "Package digest": {
+      "main": [[{ "node": "POST digest", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "version": 1,
+  "tags": [{ "name": "atlas-demo" }]
+}

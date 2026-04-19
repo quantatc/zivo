@@ -209,10 +209,54 @@ OpenAI-compatible endpoints. That lets you expose:
 As clients mature, you can keep the same Zivo UX and swap selected aliases from
 OpenRouter-backed models to direct provider routes in LiteLLM.
 
+## Atlas Operations demo
+
+Zivo ships with a flagship demo storyline — **Atlas Operations**, a fictional 80-person services firm — designed to show SMB / mid-market ops buyers what Zivo actually *does* once you're past the chat UI. See [demo/README.md](demo/README.md) for the walkthrough script.
+
+### What's in the demo
+
+- **3 Open WebUI agents** — Atlas Ops Analyst, Atlas Fraud Investigator, Atlas Vendor Concierge
+- **3 n8n workflows** — daily transaction ingestion, LLM-powered fraud policy check, daily ops digest
+- **Python tools** — `atlas_data` (read) and `atlas_actions` (write), both thin clients over `atlas-api`
+- **`atlas-api` service** — small FastAPI app that owns all DB access; both agents and n8n call it
+- **Expanded seed data** — 25 vendors, 50 customers, ~2,000 transactions over 90 days, 30 cases, daily KPI snapshots
+- **4 Evidence pages** — exec index, fraud summary, cashflow, vendor watch, case tracker
+
+### Bring-up order on a fresh stack
+
+```bash
+docker compose up -d --build      # boots atlas-api, runs seed_atlas.sql via init.d
+curl http://localhost:8088/healthz                   # confirm atlas-api is up
+curl http://localhost:8088/kpi/snapshot?period=7d    # confirm seed data
+```
+
+Then in the UIs:
+1. **Open WebUI → Workspace → Tools** — import [openwebui/tools/atlas_data.py](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/atlas_data.py) and [openwebui/tools/atlas_actions.py](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/atlas_actions.py). See [openwebui/tools/README.md](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/README.md).
+2. **Open WebUI → Workspace → Models** — create the 3 Atlas agents per [openwebui/models/README.md](/d:/AlgorithmicTradingProjects/zivo/openwebui/models/README.md).
+3. **n8n → Workflows → Import** — load the 3 JSONs per [n8n/workflows/README.md](/d:/AlgorithmicTradingProjects/zivo/n8n/workflows/README.md), then activate each.
+4. **Evidence** at `https://reports.tafarax.com` rebuilds automatically on container restart and now shows the full Atlas dashboards.
+
+### Applying the seed to an existing database
+
+`scripts/seed_atlas.sql` only runs automatically on a *fresh* postgres data directory. To apply it to an already-initialized DB (e.g. production):
+
+```bash
+docker compose exec postgres psql -U $POSTGRES_USER -d $POSTGRES_DB \
+  -f /docker-entrypoint-initdb.d/02-seed_atlas.sql
+```
+
+The script is idempotent — re-running it is safe.
+
 ## Files
 
-- [docker-compose.yml](/d:/AlgorithmicTradingProjects/zivo/docker-compose.yml): demo stack
+- [docker-compose.yml](/d:/AlgorithmicTradingProjects/zivo/docker-compose.yml): demo stack (now includes `atlas-api`)
 - [.env.example](/d:/AlgorithmicTradingProjects/zivo/.env.example): required environment variables
 - [litellm/config.yaml](/d:/AlgorithmicTradingProjects/zivo/litellm/config.yaml): LiteLLM aliases
+- [scripts/seed_atlas.sql](/d:/AlgorithmicTradingProjects/zivo/scripts/seed_atlas.sql): Atlas demo schema + seed
+- [atlas-api/](/d:/AlgorithmicTradingProjects/zivo/atlas-api/): FastAPI service backing tools and workflows
+- [openwebui/](/d:/AlgorithmicTradingProjects/zivo/openwebui/): Atlas tools and model definitions
+- [n8n/workflows/](/d:/AlgorithmicTradingProjects/zivo/n8n/workflows/): importable n8n workflows
+- [evidence/pages/](/d:/AlgorithmicTradingProjects/zivo/evidence/pages/): Evidence dashboard pages
+- [demo/README.md](/d:/AlgorithmicTradingProjects/zivo/demo/README.md): demo walkthrough cheat sheet
 - [branding/logo.png](/d:/AlgorithmicTradingProjects/zivo/branding/logo.png): app logo
 - [branding/favicon.png](/d:/AlgorithmicTradingProjects/zivo/branding/favicon.png): favicon
