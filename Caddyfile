@@ -9,6 +9,26 @@ zivo.tafarax.com {
     @openwebui_branding path /static/logo.png /static/splash.png /static/splash-dark.png /static/favicon* /static/apple-touch-icon.png /static/web-app-manifest-*.png /favicon.ico /favicon.png
     header @openwebui_branding Cache-Control "no-store"
 
+    handle /favicon.ico {
+        rewrite * /static/favicon.ico
+        reverse_proxy 127.0.0.1:3000
+    }
+
+    handle /favicon.png {
+        rewrite * /static/favicon.png
+        reverse_proxy 127.0.0.1:3000
+    }
+
+    handle /favicon.svg {
+        rewrite * /static/favicon.svg
+        reverse_proxy 127.0.0.1:3000
+    }
+
+    handle /apple-touch-icon.png {
+        rewrite * /static/apple-touch-icon.png
+        reverse_proxy 127.0.0.1:3000
+    }
+
     @n8n path /n8n /n8n/*
     handle @n8n {
         uri strip_prefix /n8n
