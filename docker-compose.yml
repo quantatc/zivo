@@ -149,9 +149,17 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
     volumes:
       - open-webui-data:/app/backend/data
-      - ./branding/logo.png:/app/backend/open_webui/static/logo.png
-      - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png
-      - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico
+      - ./branding/logo.png:/app/backend/open_webui/static/logo.png:ro
+      - ./branding/logo.png:/app/backend/open_webui/static/splash.png:ro
+      - ./branding/logo.png:/app/backend/open_webui/static/splash-dark.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/favicon.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/favicon-96x96.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/favicon-dark.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/apple-touch-icon.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/web-app-manifest-192x192.png:ro
+      - ./branding/favicon.png:/app/backend/open_webui/static/web-app-manifest-512x512.png:ro
+      - ./branding/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
+      - ./branding/favicon.svg:/app/backend/open_webui/static/favicon.svg:ro
     ports:
       - "127.0.0.1:3000:8080"
     restart: unless-stopped

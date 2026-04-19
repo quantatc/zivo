@@ -6,6 +6,9 @@ reports.tafarax.com {
 zivo.tafarax.com {
     encode gzip zstd
 
+    @openwebui_branding path /static/logo.png /static/splash.png /static/splash-dark.png /static/favicon* /static/apple-touch-icon.png /static/web-app-manifest-*.png /favicon.ico /favicon.png
+    header @openwebui_branding Cache-Control "no-store"
+
     @n8n path /n8n /n8n/*
     handle @n8n {
         uri strip_prefix /n8n
