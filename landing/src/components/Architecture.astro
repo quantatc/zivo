@@ -1,0 +1,160 @@
+---
+const bullets = [
+  "Private by design. Your data never leaves your perimeter.",
+  "Role-based access, SSO/SAML, and full audit trails built in.",
+  "Bring your own model keys. Pay only what you use.",
+  "Enterprise-grade encryption at rest and in transit.",
+  "White-label ready. Your brand, your domain.",
+];
+
+const domains = [
+  { name: "Finance", icon: "dollar" },
+  { name: "Sales", icon: "trend" },
+  { name: "Customer", icon: "heart" },
+  { name: "Operations", icon: "zap" },
+  { name: "People", icon: "users" },
+  { name: "Leadership", icon: "compass" },
+];
+---
+
+<section id="architecture" class="section">
+  <div class="glow-indigo w-[500px] h-[500px] top-20 -left-40 opacity-25"></div>
+  <div class="glow-cyan w-[400px] h-[400px] bottom-20 -right-40 opacity-25"></div>
+
+  <div class="container-page relative z-10">
+    <div class="grid md:grid-cols-[1fr_1.2fr] gap-12 md:gap-16 items-center">
+      <div class="reveal">
+        <span class="eyebrow mb-5">The Zivo platform</span>
+        <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight mb-6">
+          Enterprise-grade.<br />
+          <span class="gradient-text">Your data stays yours.</span>
+        </h2>
+        <p class="text-[var(--color-subtle)] text-lg leading-relaxed mb-8">
+          Zivo is built for companies that refuse to trade control for convenience.
+          Every part of the platform is designed around one principle: your enterprise, your rules.
+        </p>
+        <ul class="space-y-3">
+          {bullets.map((b) => (
+            <li class="flex items-start gap-3 text-[15px]">
+              <div class="h-6 w-6 rounded-md bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center shrink-0 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <span class="text-[var(--color-text)]">{b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="reveal" style="transition-delay: 120ms">
+        <div class="glass-strong p-6 md:p-10 relative overflow-hidden">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-gradient-to-br from-indigo-500/20 via-violet-500/10 to-cyan-400/10 blur-3xl pointer-events-none"></div>
+
+          <div class="relative text-center mb-5">
+            <div class="inline-flex items-center gap-2 chip !text-[var(--color-subtle)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Your team
+            </div>
+          </div>
+
+          <div class="relative flex justify-center mb-4">
+            <svg width="2" height="24" viewBox="0 0 2 24" class="opacity-50">
+              <line x1="1" y1="0" x2="1" y2="24" stroke="url(#g1)" stroke-width="1" stroke-dasharray="2 2" />
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#64748b" stop-opacity="0"/>
+                  <stop offset="100%" stop-color="#6366f1"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+
+          <div class="relative mb-6">
+            <div class="glass-strong p-6 rounded-2xl border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 via-violet-500/5 to-cyan-400/10 relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-500/20 blur-2xl"></div>
+              <div class="relative flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                  <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center font-black text-white shadow-lg shadow-indigo-500/40">
+                    Z
+                  </div>
+                  <div>
+                    <div class="font-bold text-base">Zivo Core</div>
+                    <div class="text-[10px] text-[var(--color-muted)] font-mono uppercase tracking-widest">unified AI workspace</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 chip !text-emerald-300 border-emerald-500/30 bg-emerald-500/10">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-slow"></span>
+                  live
+                </div>
+              </div>
+
+              <div class="relative grid grid-cols-3 gap-2.5">
+                <div class="glass p-3 text-center">
+                  <div class="h-8 w-8 mx-auto mb-1.5 rounded-lg bg-gradient-to-br from-indigo-500/30 to-violet-500/20 border border-indigo-400/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                  </div>
+                  <div class="text-[11px] font-semibold">Agents</div>
+                </div>
+                <div class="glass p-3 text-center">
+                  <div class="h-8 w-8 mx-auto mb-1.5 rounded-lg bg-gradient-to-br from-cyan-500/30 to-indigo-500/20 border border-cyan-400/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+                  </div>
+                  <div class="text-[11px] font-semibold">Automation</div>
+                </div>
+                <div class="glass p-3 text-center">
+                  <div class="h-8 w-8 mx-auto mb-1.5 rounded-lg bg-gradient-to-br from-emerald-500/30 to-cyan-500/20 border border-emerald-400/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                  </div>
+                  <div class="text-[11px] font-semibold">Analytics</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative flex justify-center mb-4">
+            <div class="flex gap-8 md:gap-12">
+              {[0, 1, 2].map(() => (
+                <div class="h-6 w-px bg-gradient-to-b from-indigo-400/50 to-transparent"></div>
+              ))}
+            </div>
+          </div>
+
+          <div class="relative mb-5">
+            <div class="text-[10px] text-[var(--color-muted)] uppercase tracking-widest text-center mb-3 font-mono">
+              one workspace, every function
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              {domains.map((d) => (
+                <div class="glass px-2.5 py-2.5 text-center hover:border-[var(--color-border-strong)] transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-1 opacity-80">
+                    {d.icon === "dollar" && <><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>}
+                    {d.icon === "trend" && <><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>}
+                    {d.icon === "heart" && <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>}
+                    {d.icon === "zap" && <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>}
+                    {d.icon === "users" && <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>}
+                    {d.icon === "compass" && <><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></>}
+                  </svg>
+                  <div class="text-[11px] font-semibold">{d.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="relative border-t border-[var(--color-border)] pt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <div class="flex items-center gap-1.5 text-[10px] text-[var(--color-muted)] uppercase tracking-widest font-mono">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              your infrastructure
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-[var(--color-muted)] uppercase tracking-widest font-mono">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              your data
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-[var(--color-muted)] uppercase tracking-widest font-mono">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.85 12.15 8.15-8.15"/><path d="m18 5 2 2"/><path d="m15 8 2 2"/></svg>
+              your keys
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

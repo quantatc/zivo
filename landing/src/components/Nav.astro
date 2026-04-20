@@ -1,0 +1,53 @@
+---
+const APP_URL = "https://app.tafarax.com";
+---
+
+<nav
+  data-nav
+  class="fixed top-0 inset-x-0 z-50 transition-all duration-300 [&.is-scrolled]:backdrop-blur-xl [&.is-scrolled]:bg-[rgba(8,8,15,0.75)] [&.is-scrolled]:border-b [&.is-scrolled]:border-[var(--color-border)]"
+>
+  <div class="container-page flex items-center justify-between h-16">
+    <a href="/" class="flex items-center gap-2.5 group">
+      <img src="/logo.png" alt="Zivo" class="h-7 w-7 rounded-md" />
+      <span class="text-lg font-bold tracking-tight gradient-text">Zivo</span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-8 text-sm text-[var(--color-subtle)]">
+      <a href="#features" class="hover:text-white transition-colors">Features</a>
+      <a href="#how" class="hover:text-white transition-colors">How it works</a>
+      <a href="#use-cases" class="hover:text-white transition-colors">Use cases</a>
+      <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
+      <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+    </div>
+
+    <div class="hidden md:flex items-center gap-3">
+      <a href={APP_URL} class="btn btn-ghost text-sm">Sign in</a>
+      <a href={`${APP_URL}/signup`} class="btn btn-primary text-sm">Get a demo →</a>
+    </div>
+
+    <button
+      data-menu-btn
+      class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-border-strong)]"
+      aria-label="Toggle menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div
+    data-menu
+    class="hidden md:hidden fixed inset-0 top-16 bg-[var(--color-bg)]/95 backdrop-blur-xl"
+  >
+    <div class="container-page py-8 flex flex-col gap-6 text-lg">
+      <a href="#features" class="py-2 border-b border-[var(--color-border)]">Features</a>
+      <a href="#how" class="py-2 border-b border-[var(--color-border)]">How it works</a>
+      <a href="#use-cases" class="py-2 border-b border-[var(--color-border)]">Use cases</a>
+      <a href="#architecture" class="py-2 border-b border-[var(--color-border)]">Architecture</a>
+      <a href="#pricing" class="py-2 border-b border-[var(--color-border)]">Pricing</a>
+      <div class="flex flex-col gap-3 mt-4">
+        <a href={APP_URL} class="btn btn-ghost">Sign in</a>
+        <a href={`${APP_URL}/signup`} class="btn btn-primary">Get a demo →</a>
+      </div>
+    </div>
+  </div>
+</nav>

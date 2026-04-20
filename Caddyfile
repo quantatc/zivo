@@ -6,6 +6,18 @@ reports.tafarax.com {
 zivo.tafarax.com {
     encode gzip zstd
 
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    reverse_proxy 127.0.0.1:3200
+}
+
+app.tafarax.com {
+    encode gzip zstd
+
     @openwebui_branding path /static/logo.png /static/splash.png /static/splash-dark.png /static/favicon* /static/apple-touch-icon.png /static/web-app-manifest-*.png /favicon.ico /favicon.png
     header @openwebui_branding Cache-Control "no-store"
 

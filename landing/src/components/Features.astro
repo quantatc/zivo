@@ -1,0 +1,162 @@
+---
+const features = [
+  {
+    icon: "bot",
+    title: "Intelligent AI agents",
+    body: "Deploy specialist agents for any function, from finance to sales to HR. Chat-native, context-aware, always on. Trained on your own knowledge and data.",
+    tag: "Any model. Any time.",
+    accent: "indigo",
+  },
+  {
+    icon: "workflow",
+    title: "Visual workflow engine",
+    body: "Build multi-step automations with a drag-and-drop canvas. Trigger from webhooks, schedules, or agent outputs. Hundreds of connectors out of the box.",
+    tag: "400+ connectors",
+    accent: "cyan",
+  },
+  {
+    icon: "chart",
+    title: "Live intelligence dashboards",
+    body: "Real-time analytics that connect directly to your systems of record. Version-controlled, shareable, always reflecting the latest data.",
+    tag: "Live data. Zero delay.",
+    accent: "emerald",
+  },
+];
+
+const gradients: Record<string, string> = {
+  indigo: "from-indigo-500/20 to-violet-500/10 border-indigo-500/30",
+  cyan: "from-cyan-400/20 to-indigo-500/10 border-cyan-400/30",
+  emerald: "from-emerald-500/20 to-cyan-500/10 border-emerald-500/30",
+};
+const iconColors: Record<string, string> = {
+  indigo: "#a5b4fc",
+  cyan: "#67e8f9",
+  emerald: "#6ee7b7",
+};
+
+const atlasFeatures = [
+  "Pre-built agents for every department",
+  "Ready-to-launch automation templates",
+  "Live dashboards across all functions",
+  "Sample data and end-to-end scenarios",
+  "Deploy in a single afternoon",
+  "Fully customizable to your brand",
+];
+---
+
+<section id="features" class="section">
+  <div class="glow-indigo w-[600px] h-[600px] top-20 -right-40 opacity-30"></div>
+
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl mb-16 reveal">
+      <span class="eyebrow mb-5">The platform</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight">
+        One workspace. <span class="gradient-text">Every AI capability</span><br />
+        your enterprise needs.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mb-5">
+      {features.map((f, i) => {
+            return (
+          <div
+            class="glass p-7 reveal group relative overflow-hidden"
+            style={`transition-delay: ${i * 100}ms`}
+          >
+            <div class={`absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br ${gradients[f.accent]} opacity-30 blur-3xl group-hover:opacity-60 transition-opacity`}></div>
+
+            <div class={`relative h-12 w-12 rounded-xl bg-gradient-to-br ${gradients[f.accent]} border flex items-center justify-center mb-6`}>
+              {f.icon === "bot" && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColors[f.accent]} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+              )}
+              {f.icon === "workflow" && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColors[f.accent]} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg>
+              )}
+              {f.icon === "chart" && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColors[f.accent]} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+              )}
+            </div>
+
+            <h3 class="relative text-xl font-bold mb-3">{f.title}</h3>
+            <p class="relative text-[var(--color-subtle)] leading-relaxed mb-5">{f.body}</p>
+            <span class="relative chip">{f.tag}</span>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="glass-strong p-8 md:p-10 grid md:grid-cols-[1fr_1.1fr] gap-10 items-center reveal">
+      <div>
+        <span class="chip !text-indigo-300 border-indigo-400/30 bg-indigo-500/10 mb-4">Zivo Starter Pack</span>
+        <h3 class="text-2xl md:text-3xl font-bold leading-tight mb-4">
+          A full enterprise workspace,<br />
+          <span class="gradient-text">out of the box.</span>
+        </h3>
+        <p class="text-[var(--color-subtle)] leading-relaxed mb-6">
+          Launch Zivo with a complete starting point. Agents, workflows, and dashboards already wired together across every department. Customize, extend, and ship your own on top.
+        </p>
+        <ul class="space-y-2.5 mb-6">
+          {atlasFeatures.map((f) => (
+            <li class="flex items-center gap-3 text-sm">
+              <div class="h-5 w-5 rounded-md bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              {f}
+            </li>
+          ))}
+        </ul>
+        <a href="#use-cases" class="btn btn-ghost text-sm">
+          Explore the demo
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="relative">
+        <div class="glass p-5 space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
+            <div class="flex items-center gap-2">
+              <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500"></div>
+              <div>
+                <div class="text-sm font-semibold">Company Pulse · This Week</div>
+                <div class="text-[10px] text-[var(--color-muted)] font-mono">live dashboard</div>
+              </div>
+            </div>
+            <span class="chip !text-emerald-300 border-emerald-500/30 bg-emerald-500/10">LIVE</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="p-3 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+              <div class="text-[10px] text-[var(--color-muted)] uppercase tracking-wider mb-1">Revenue</div>
+              <div class="text-xl font-bold">$2.4M</div>
+              <div class="text-[10px] text-emerald-300 font-mono">↑ 12%</div>
+            </div>
+            <div class="p-3 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+              <div class="text-[10px] text-[var(--color-muted)] uppercase tracking-wider mb-1">Actions</div>
+              <div class="text-xl font-bold">47</div>
+              <div class="text-[10px] text-amber-300 font-mono">automated</div>
+            </div>
+            <div class="p-3 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+              <div class="text-[10px] text-[var(--color-muted)] uppercase tracking-wider mb-1">Health</div>
+              <div class="text-xl font-bold">98.4%</div>
+              <div class="text-[10px] text-emerald-300 font-mono">↑ 0.3%</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+            <div class="flex items-end gap-1.5 h-24">
+              {[40, 55, 48, 72, 65, 88, 70, 95, 82, 90, 75, 100].map((h) => (
+                <div
+                  class="flex-1 rounded-t bg-gradient-to-t from-indigo-500/80 to-cyan-400/60"
+                  style={`height: ${h}%`}
+                ></div>
+              ))}
+            </div>
+            <div class="flex justify-between text-[9px] text-[var(--color-muted)] mt-2 font-mono">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

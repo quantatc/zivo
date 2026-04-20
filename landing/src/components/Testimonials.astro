@@ -1,0 +1,51 @@
+---
+const quotes = [
+  {
+    body: "Zivo replaced three separate tools we were paying for. The n8n + AI agent combo now handles our weekly vendor reconciliation without a single human touch.",
+    name: "Head of Operations",
+    company: "Mid-market logistics firm",
+    initial: "H",
+  },
+  {
+    body: "We stood it up on a Friday afternoon. By Monday standup, our ops team was already triaging flagged payments via the chat agent. Fastest tool adoption I've ever seen.",
+    name: "Director of Finance",
+    company: "SaaS company · 80 FTE",
+    initial: "D",
+  },
+  {
+    body: "The fact that it's self-hosted killed every objection from our security team in one meeting. That alone made the difference.",
+    name: "CTO",
+    company: "Regulated fintech",
+    initial: "C",
+  },
+];
+---
+
+<section class="section">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl mb-14 reveal">
+      <span class="eyebrow mb-5">Early adopters</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight">
+        What teams running Zivo <span class="gradient-text">are telling us.</span>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      {quotes.map((q, i) => (
+        <div class="glass p-7 reveal flex flex-col" style={`transition-delay: ${i * 100}ms`}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-5 opacity-60"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+          <p class="text-[var(--color-text)] leading-relaxed mb-6 flex-1">{q.body}</p>
+          <div class="flex items-center gap-3 pt-5 border-t border-[var(--color-border)]">
+            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center font-bold">
+              {q.initial}
+            </div>
+            <div>
+              <div class="text-sm font-semibold">{q.name}</div>
+              <div class="text-xs text-[var(--color-muted)]">{q.company}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

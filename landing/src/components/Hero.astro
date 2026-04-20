@@ -1,0 +1,155 @@
+---
+const APP_URL = "https://app.tafarax.com";
+---
+
+<section class="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
+  <div class="glow-indigo w-[700px] h-[700px] -top-40 -left-40 opacity-60"></div>
+  <div class="glow-cyan w-[500px] h-[500px] top-40 right-0 opacity-40"></div>
+  <div class="glow-violet w-[400px] h-[400px] bottom-0 left-1/3 opacity-30"></div>
+
+  <div class="container-page relative z-10">
+    <div class="grid lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+      <div class="reveal">
+        <span class="eyebrow mb-6">
+          <span class="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-emerald)] animate-pulse-slow"></span>
+          Now in early access
+        </span>
+
+        <h1 class="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1.02] tracking-tight mb-6">
+          Every team.<br />
+          Every workflow.<br />
+          <span class="gradient-text animate-gradient">One AI workspace.</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-[var(--color-subtle)] max-w-xl leading-relaxed mb-8">
+          Zivo brings intelligent agents, workflow automation, and live analytics into one private workspace
+          for your entire enterprise. Deploy in a day. Scale forever.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <a href={`${APP_URL}/signup`} class="btn btn-primary">
+            Start free trial
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#how" class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            See it in action
+          </a>
+        </div>
+
+        <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[var(--color-muted)]">
+          <div class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Private by default
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            SSO & SAML ready
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Zero vendor lock-in
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal relative" style="transition-delay: 120ms">
+        <div class="glass-strong p-2 rounded-2xl shadow-2xl shadow-indigo-500/10 animate-float">
+          <div class="flex items-center gap-1.5 px-3 py-2.5 border-b border-[var(--color-border)]">
+            <span class="h-2.5 w-2.5 rounded-full bg-red-400/60"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-yellow-400/60"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-400/60"></span>
+            <div class="ml-3 text-[10px] text-[var(--color-muted)] font-mono">app.tafarax.com</div>
+          </div>
+          <div class="p-5 font-mono text-[13px] space-y-3 min-h-[380px]">
+            <div class="flex items-start gap-3">
+              <div class="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-xs font-bold shrink-0">S</div>
+              <div class="flex-1">
+                <div class="text-[11px] text-[var(--color-muted)] mb-1">Sarah · 2s ago</div>
+                <div class="text-[var(--color-text)] leading-relaxed">
+                  Scan yesterday's vendor payments. Anything unusual?
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="h-7 w-7 rounded-lg bg-gradient-to-br from-cyan-400/20 to-indigo-500/20 border border-cyan-400/30 flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+              </div>
+              <div class="flex-1">
+                <div class="text-[11px] text-cyan-300 mb-1">Zivo · Finance Co-pilot</div>
+                <div class="text-[var(--color-subtle)] leading-relaxed">
+                  Flagged <span class="text-white font-semibold">3 anomalies</span> across $284k in payments:
+                </div>
+                <div class="mt-2 space-y-1.5">
+                  <div class="glass px-3 py-2 text-xs flex items-center justify-between">
+                    <span>NovaPart Ltd · $84,200</span>
+                    <span class="chip !text-amber-300 border-amber-500/30 bg-amber-500/10">Duplicate</span>
+                  </div>
+                  <div class="glass px-3 py-2 text-xs flex items-center justify-between">
+                    <span>Helix Logistics · $127,500</span>
+                    <span class="chip !text-rose-300 border-rose-500/30 bg-rose-500/10">Off-pattern</span>
+                  </div>
+                  <div class="glass px-3 py-2 text-xs flex items-center justify-between">
+                    <span>Verve Co. · $72,300</span>
+                    <span class="chip !text-amber-300 border-amber-500/30 bg-amber-500/10">New vendor</span>
+                  </div>
+                </div>
+                <div class="mt-2 text-[var(--color-subtle)]">
+                  Drafted review workflow. <span class="text-cyan-300 underline decoration-dotted cursor-pointer">Approve →</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 pl-10 pt-1">
+              <div class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-slow"></div>
+              <span class="text-[10px] text-[var(--color-muted)]">Workflow triggered · 3 approvers notified</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute -bottom-6 -left-4 glass px-3 py-2 flex items-center gap-2 text-xs animate-float" style="animation-delay: 1s">
+          <div class="h-6 w-6 rounded-md bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg>
+          </div>
+          <span class="font-medium">3 agents active</span>
+        </div>
+
+        <div class="absolute -top-4 -right-2 glass px-3 py-2 flex items-center gap-2 text-xs animate-float" style="animation-delay: 2s">
+          <div class="h-6 w-6 rounded-md bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/></svg>
+          </div>
+          <span class="font-medium">Live dashboards</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-24 reveal" style="transition-delay: 240ms">
+      <div class="text-xs text-center text-[var(--color-muted)] mb-8 uppercase tracking-widest font-mono">
+        Built for the enterprise
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
+        {[
+          { label: "Private by default", icon: "shield" },
+          { label: "SSO & SAML", icon: "key" },
+          { label: "Audit logs", icon: "file" },
+          { label: "Role-based access", icon: "users" },
+          { label: "Bring your own keys", icon: "lock" },
+          { label: "No data retention", icon: "eye-off" },
+        ].map((item) => (
+          <div class="glass px-4 py-3 flex items-center gap-2.5 text-xs text-[var(--color-subtle)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+              {item.icon === "shield" && <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />}
+              {item.icon === "key" && <><circle cx="8" cy="15" r="4" /><path d="m10.85 12.15 8.15-8.15" /><path d="m18 5 2 2" /><path d="m15 8 2 2" /></>}
+              {item.icon === "file" && <><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></>}
+              {item.icon === "users" && <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>}
+              {item.icon === "lock" && <><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>}
+              {item.icon === "eye-off" && <><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></>}
+            </svg>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

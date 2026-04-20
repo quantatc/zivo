@@ -1,0 +1,107 @@
+---
+import "../styles/global.css";
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Zivo · Enterprise AI Workspace",
+  description = "Zivo unifies intelligent agents, workflow automation, and live analytics into one private workspace for your whole enterprise. Deploy in a day. Scale forever.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:site_name" content="Zivo" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <meta name="theme-color" content="#08080f" />
+
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  </head>
+  <body class="min-h-screen">
+    <div class="fixed inset-0 grid-dots opacity-40 pointer-events-none z-0"></div>
+    <slot />
+
+    <script is:inline>
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-visible");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      const nav = document.querySelector("[data-nav]");
+      if (nav) {
+        const onScroll = () => {
+          if (window.scrollY > 40) nav.classList.add("is-scrolled");
+          else nav.classList.remove("is-scrolled");
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+      }
+
+      const menuBtn = document.querySelector("[data-menu-btn]");
+      const menu = document.querySelector("[data-menu]");
+      if (menuBtn && menu) {
+        menuBtn.addEventListener("click", () => {
+          menu.classList.toggle("hidden");
+          document.body.style.overflow = menu.classList.contains("hidden")
+            ? ""
+            : "hidden";
+        });
+        menu.querySelectorAll("a").forEach((a) =>
+          a.addEventListener("click", () => {
+            menu.classList.add("hidden");
+            document.body.style.overflow = "";
+          })
+        );
+      }
+
+      const tabs = document.querySelectorAll("[data-tab]");
+      const panels = document.querySelectorAll("[data-panel]");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const key = tab.getAttribute("data-tab");
+          tabs.forEach((t) => t.classList.remove("is-active"));
+          tab.classList.add("is-active");
+          panels.forEach((p) => {
+            if (p.getAttribute("data-panel") === key) p.classList.remove("hidden");
+            else p.classList.add("hidden");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

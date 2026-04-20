@@ -1,0 +1,59 @@
+---
+const steps = [
+  {
+    num: "01",
+    title: "Launch your workspace",
+    body: "Spin up Zivo on your infrastructure in minutes. Secure by default, fully branded, and ready for your team.",
+    code: "launch workspace",
+  },
+  {
+    num: "02",
+    title: "Connect your systems",
+    body: "Plug into your existing tools and data sources with hundreds of connectors. Nothing leaves your perimeter.",
+    code: "connect data sources",
+  },
+  {
+    num: "03",
+    title: "Empower every team",
+    body: "Invite people, assign agents, launch workflows. Your enterprise AI workspace goes live the same day.",
+    code: "go live today",
+  },
+];
+---
+
+<section id="how" class="section">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl mb-16 reveal">
+      <span class="eyebrow mb-5">How it works</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight">
+        From zero to <span class="gradient-text">AI-powered ops</span><br />
+        in three steps.
+      </h2>
+    </div>
+
+    <div class="relative">
+      <div class="hidden md:block absolute top-16 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"></div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        {steps.map((s, i) => (
+          <div class="reveal" style={`transition-delay: ${i * 120}ms`}>
+            <div class="glass p-7 h-full relative">
+              <div class="flex items-center justify-between mb-5">
+                <div class="text-5xl font-black gradient-text leading-none">{s.num}</div>
+                <div class="h-10 w-10 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg)] flex items-center justify-center">
+                  <div class="h-2 w-2 rounded-full bg-indigo-400 animate-pulse-slow"></div>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold mb-3">{s.title}</h3>
+              <p class="text-[var(--color-subtle)] leading-relaxed mb-5">{s.body}</p>
+              <div class="chip !text-cyan-300 !bg-cyan-500/5 border-cyan-400/20 w-full justify-start">
+                <span class="text-cyan-400/70">›</span>
+                <span>{s.code}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

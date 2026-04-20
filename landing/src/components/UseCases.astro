@@ -1,0 +1,69 @@
+---
+const cases = [
+  {
+    key: "finance",
+    tab: "Finance & Operations",
+    title: "Anomalies caught before coffee's brewed.",
+    body: "Spot a payment anomaly at 9am. Your Zivo agent has already flagged it, drafted an incident report, and triggered a 3-person review workflow before anyone sits down at their desk.",
+    stat: "−82%",
+    statLabel: "time to detection",
+  },
+  {
+    key: "revenue",
+    tab: "Sales & Customer",
+    title: "Every lead answered in seconds.",
+    body: "A high-value prospect asks about pricing, product fit, and SLA in one email. Your Zivo agent pulls the data, checks the contract history, and drafts the perfect response. Your team hits send.",
+    stat: "3 min",
+    statLabel: "average response time",
+  },
+  {
+    key: "leadership",
+    tab: "Leadership & Strategy",
+    title: "Monday mornings, already done.",
+    body: "The weekly company dashboard is already built, annotated by your AI agent, and waiting in the shared workspace. You walk into the executive standup with answers, not questions.",
+    stat: "0",
+    statLabel: "hours on manual prep",
+  },
+];
+---
+
+<section id="use-cases" class="section">
+  <div class="glow-violet w-[500px] h-[500px] bottom-20 left-0 opacity-30"></div>
+
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl mb-12 reveal">
+      <span class="eyebrow mb-5">Use cases</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight">
+        Built for every team that <span class="gradient-text">moves the business forward.</span>
+      </h2>
+    </div>
+
+    <div class="reveal">
+      <div class="flex flex-wrap gap-2 mb-6 p-1.5 glass w-fit">
+        {cases.map((c, i) => (
+          <button
+            data-tab={c.key}
+            class={`px-4 py-2 rounded-md text-sm font-medium transition-all ${i === 0 ? "is-active bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "text-[var(--color-subtle)] hover:text-white"} [&.is-active]:bg-gradient-to-r [&.is-active]:from-indigo-500 [&.is-active]:to-violet-500 [&.is-active]:text-white`}
+          >
+            {c.tab}
+          </button>
+        ))}
+      </div>
+
+      {cases.map((c, i) => (
+        <div data-panel={c.key} class={`glass-strong p-8 md:p-12 ${i === 0 ? "" : "hidden"}`}>
+          <div class="grid md:grid-cols-[1.3fr_1fr] gap-10 items-center">
+            <div>
+              <h3 class="text-2xl md:text-3xl font-bold leading-tight mb-5">{c.title}</h3>
+              <p class="text-lg text-[var(--color-subtle)] leading-relaxed">{c.body}</p>
+            </div>
+            <div class="glass p-8 text-center">
+              <div class="text-6xl md:text-7xl font-black gradient-text mb-2">{c.stat}</div>
+              <div class="text-sm text-[var(--color-muted)] uppercase tracking-widest font-mono">{c.statLabel}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

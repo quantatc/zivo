@@ -222,7 +222,7 @@ services:
       N8N_EDITOR_BASE_URL: ${WEBHOOK_URL}
       N8N_PATH: /n8n/
       N8N_PROXY_HOPS: "1"
-      N8N_HOST: zivo.tafarax.com
+      N8N_HOST: app.tafarax.com
       N8N_PROTOCOL: https
       N8N_SECURE_COOKIE: "true"
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
@@ -302,6 +302,21 @@ services:
       timeout: 10s
       retries: 5
       start_period: 120s
+    restart: unless-stopped
+
+  landing:
+    build:
+      context: ./landing
+      dockerfile: Dockerfile
+    container_name: zivo-landing
+    ports:
+      - "127.0.0.1:3200:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
 volumes:

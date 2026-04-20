@@ -1,0 +1,51 @@
+---
+const pains = [
+  {
+    icon: "alert",
+    title: "Scattered context",
+    body: "Your people switch between six or more tools to answer one question. Hours lost, every single day.",
+  },
+  {
+    icon: "shuffle",
+    title: "Manual handoffs",
+    body: "Approvals, escalations, and reports all live in someone's inbox, or that Slack thread nobody reads.",
+  },
+  {
+    icon: "chart",
+    title: "Stale data",
+    body: "By the time the dashboard finishes loading, the decision has already been made without it.",
+  },
+];
+---
+
+<section class="section">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl mb-14 reveal">
+      <span class="eyebrow mb-5">The problem</span>
+      <h2 class="text-[clamp(1.8rem,4vw,3rem)] font-black leading-tight">
+        Your team is drowning in tools <br class="hidden md:block" />
+        that <span class="gradient-text">don't talk to each other.</span>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      {pains.map((p, i) => (
+        <div class="glass p-7 reveal hover:border-[var(--color-border-strong)] transition-colors" style={`transition-delay: ${i * 80}ms`}>
+          <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-rose-500/20 to-amber-500/10 border border-rose-500/20 flex items-center justify-center mb-5">
+            {p.icon === "alert" && (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fda4af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            )}
+            {p.icon === "shuffle" && (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fda4af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+            )}
+            {p.icon === "chart" && (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fda4af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 12v5"/><path d="M11 8v9"/><path d="M15 14v3"/><path d="M19 6v11"/></svg>
+            )}
+          </div>
+          <h3 class="text-xl font-bold mb-2">{p.title}</h3>
+          <p class="text-[var(--color-subtle)] leading-relaxed">{p.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
