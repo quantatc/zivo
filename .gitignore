@@ -131,6 +131,7 @@ celerybeat.pid
 .env
 .env.backup
 .env.*.backup
+*.bundle
 .venv
 env/
 venv/
