@@ -50,7 +50,7 @@ Use a small, linear branch for Zivo changes:
 
 ```text
 upstream/main or upstream tag
-  -> zivo/v0.8.12
+  -> zivo/v0.9.2
       commit 1: Zivo branding
       commit 2: Zivo terminology
       commit 3: Agent creation UX
@@ -92,14 +92,14 @@ GitHub fork and set the `origin` remote later.
 ## Building The Fork Image Locally
 
 ```bash
-OPEN_WEBUI_FORK_IMAGE=zivo-openwebui:v0.8.12-zivo.1 \
+OPEN_WEBUI_FORK_IMAGE=zivo-openwebui:v0.9.2-zivo.1 \
   ./scripts/build-openwebui-fork.sh
 ```
 
 Then run the stack with the fork override:
 
 ```bash
-OPEN_WEBUI_IMAGE=zivo-openwebui:v0.8.12-zivo.1 \
+OPEN_WEBUI_IMAGE=zivo-openwebui:v0.9.2-zivo.1 \
   docker compose -f docker-compose.yml -f docker-compose.fork.yml up -d open-webui
 ```
 
@@ -107,7 +107,7 @@ For production, prefer pushing the image to a registry and setting
 `OPEN_WEBUI_IMAGE` in `.env`:
 
 ```env
-OPEN_WEBUI_IMAGE=ghcr.io/YOUR_ORG/zivo-openwebui:v0.8.12-zivo.1
+OPEN_WEBUI_IMAGE=ghcr.io/YOUR_ORG/zivo-openwebui:v0.9.2-zivo.1
 ```
 
 Then deploy normally:
@@ -123,15 +123,16 @@ In the `zivo-openwebui` repo:
 
 ```bash
 git fetch upstream --tags
-git switch zivo/v0.8.12
-git rebase upstream/main
+git switch zivo/vCURRENT
+git switch -c zivo/vNEXT
+git rebase refs/tags/vNEXT
 ```
 
 Resolve conflicts only in the small Zivo commits. Rebuild and test before
 deploying:
 
 ```bash
-docker build -t ghcr.io/YOUR_ORG/zivo-openwebui:v0.8.13-zivo.1 .
+docker build -t ghcr.io/YOUR_ORG/zivo-openwebui:vNEXT-zivo.1 .
 ```
 
 ## Maintenance Rules

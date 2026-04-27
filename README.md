@@ -7,7 +7,7 @@ later plug in custom agent backends.
 
 ## Stack
 
-- Open WebUI v0.8.12 as the user-facing chat interface
+- Open WebUI v0.9.2 as the user-facing chat interface
 - LiteLLM as the LLM gateway and model alias layer
 - Postgres for LiteLLM state and admin configuration
 - Local branding assets mounted into Open WebUI
