@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
+import logging
 from typing import Any, Literal
 
 import asyncpg
@@ -37,9 +38,65 @@ class Settings(BaseSettings):
     litellm_email_model: str = "Zivo Fast (GPT-5 Mini)"
 
     n8n_webhook_base_url: str = "http://n8n:5678/webhook"
+    atlas_demo_auto_refresh_dates: bool = True
 
 
 settings = Settings()
+logger = logging.getLogger("atlas-api")
+
+
+async def _refresh_demo_dates_if_stale(pool: asyncpg.Pool) -> None:
+    """
+    Keep the Atlas demo timeline current when a persisted Postgres volume is
+    reused across demo days.
+
+    The seed data is generated relative to NOW(), but Docker init scripts only
+    run for a fresh data directory. Without this, a week-old volume makes
+    "last 7 days" KPI requests look empty even though the demo is seeded.
+    """
+    today = datetime.now(timezone.utc).date()
+
+    async with pool.acquire() as con:
+        async with con.transaction():
+            await con.execute("SELECT pg_advisory_xact_lock(423019042)")
+
+            max_snapshot = await con.fetchval("SELECT MAX(snapshot_date) FROM kpi_snapshots")
+            if max_snapshot is None:
+                return
+
+            delta_days = (today - max_snapshot).days
+            if delta_days <= 0:
+                return
+
+            await con.execute(
+                """
+                UPDATE transactions
+                SET created_at = created_at + ($1::int * INTERVAL '1 day')
+                """,
+                delta_days,
+            )
+            await con.execute(
+                """
+                UPDATE investigation_cases
+                SET opened_at = opened_at + ($1::int * INTERVAL '1 day'),
+                    resolved_at = resolved_at + ($1::int * INTERVAL '1 day')
+                """,
+                delta_days,
+            )
+
+            # Move dates out of the way first to avoid primary-key collisions
+            # on the contiguous kpi_snapshots.snapshot_date range.
+            await con.execute("UPDATE kpi_snapshots SET snapshot_date = snapshot_date + 10000")
+            await con.execute(
+                """
+                UPDATE kpi_snapshots
+                SET snapshot_date = snapshot_date - 10000 + $1::int,
+                    generated_at = generated_at + ($1::int * INTERVAL '1 day')
+                """,
+                delta_days,
+            )
+
+    logger.info("Refreshed Atlas demo dates by %s day(s)", delta_days)
 
 
 # ---------------------------------------------------------------------------
@@ -57,6 +114,8 @@ async def lifespan(app: FastAPI):
         min_size=1,
         max_size=8,
     )
+    if settings.atlas_demo_auto_refresh_dates:
+        await _refresh_demo_dates_if_stale(app.state.pool)
     app.state.http = httpx.AsyncClient(timeout=30.0)
     try:
         yield
@@ -407,6 +466,8 @@ async def vendor_summary(vendor_id: int):
 
 @app.get("/kpi/snapshot", response_model=KpiSnapshot)
 async def kpi_snapshot(period: Literal["7d", "30d", "mtd"] = "7d"):
+    if settings.atlas_demo_auto_refresh_dates:
+        await _refresh_demo_dates_if_stale(app.state.pool)
     start, end = _period_to_range(period)
     async with app.state.pool.acquire() as con:
         tx = await con.fetchrow(

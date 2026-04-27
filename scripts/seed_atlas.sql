@@ -128,6 +128,7 @@ BEGIN
     SELECT
         EXISTS (SELECT 1 FROM transactions WHERE vendor_id IS NULL LIMIT 1)
         OR (SELECT count(*) FROM transactions) < 1500
+        OR COALESCE((SELECT max(snapshot_date) < CURRENT_DATE FROM kpi_snapshots), TRUE)
     INTO needs_reseed;
 
     IF needs_reseed THEN

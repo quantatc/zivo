@@ -30,3 +30,12 @@ After import, open a chat with an agent that has the tool enabled and ask:
 The agent should call `get_kpi_snapshot(period="7d")` and return numbers from `atlas-api`.
 
 If the call fails with a connection error: confirm `atlas-api` is healthy with `docker compose ps` and that you can reach it from the open-webui container with `docker compose exec open-webui curl -s http://atlas-api:8000/healthz`.
+
+If the tool call succeeds but KPIs are zero, the Atlas demo data is probably
+stale from an old Postgres volume. Rebuild/restart `atlas-api` so it can refresh
+the seeded dates:
+
+```bash
+docker compose up -d --build atlas-api
+curl http://localhost:8088/kpi/snapshot?period=7d
+```

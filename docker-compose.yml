@@ -196,6 +196,7 @@ services:
       LITELLM_BASE_URL: http://litellm:4000
       LITELLM_API_KEY: ${LITELLM_MASTER_KEY}
       LITELLM_EMAIL_MODEL: ${ATLAS_EMAIL_MODEL:-Zivo Fast (GPT-5 Mini)}
+      ATLAS_DEMO_AUTO_REFRESH_DATES: ${ATLAS_DEMO_AUTO_REFRESH_DATES:-true}
       N8N_WEBHOOK_BASE_URL: http://n8n:5678/webhook
     ports:
       - "127.0.0.1:8088:8000"

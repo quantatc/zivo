@@ -241,6 +241,12 @@ curl http://localhost:8088/healthz                   # confirm atlas-api is up
 curl http://localhost:8088/kpi/snapshot?period=7d    # confirm seed data
 ```
 
+`atlas-api` keeps the Atlas demo timeline fresh by default. If an old Postgres
+volume is reused, the API shifts seeded transaction, case, and KPI dates so the
+latest KPI snapshot lands on today instead of returning an empty current week.
+Set `ATLAS_DEMO_AUTO_REFRESH_DATES=false` only if you want fixed historic demo
+dates.
+
 Then in the UIs:
 1. **Open WebUI → Workspace → Tools** — import [openwebui/tools/atlas_data.py](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/atlas_data.py) and [openwebui/tools/atlas_actions.py](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/atlas_actions.py). See [openwebui/tools/README.md](/d:/AlgorithmicTradingProjects/zivo/openwebui/tools/README.md).
 2. **Open WebUI → Workspace → Models** — create the 3 Atlas agents per [openwebui/models/README.md](/d:/AlgorithmicTradingProjects/zivo/openwebui/models/README.md).
@@ -256,7 +262,9 @@ docker compose exec postgres psql -U $POSTGRES_USER -d $POSTGRES_DB \
   -f /docker-entrypoint-initdb.d/02-seed_atlas.sql
 ```
 
-The script is idempotent — re-running it is safe.
+The script is idempotent for current demo data. If the KPI snapshot dates are
+stale, re-running it refreshes the Atlas demo rows so the 7-day KPI window has
+data again.
 
 ## Files
 
