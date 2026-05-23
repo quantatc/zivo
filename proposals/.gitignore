@@ -1,0 +1,12 @@
+# Compiled output
+out/
+
+# Fetched integration logos (run scripts/fetch-icons.{sh,ps1} to recreate)
+assets/integrations/*.svg
+
+# Brand fonts (run scripts/fetch-fonts.{sh,ps1} to recreate)
+fonts/*.ttf
+fonts/*.otf
+
+# Typst build cache
+.typst-cache/
